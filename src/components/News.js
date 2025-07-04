@@ -16,19 +16,21 @@ export class News extends Component {
     category: PropTypes.string,
   };
 
-  articles = [];
+  // articles = [];
+  apiKey = process.env.REACT_APP_NEWS_API_KEY;
   constructor() {
     super();
     this.state = {
-      articles: this.articles,
+      articles: [],
       loading: false,
+      page: 1,
+      totalArticles: 0,
     };
   }
 
   async componentDidMount() {
     this.setState({ loading: true });
-    const url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}
-        &category=${this.props.category}&apiKey=your_api_key&page=1&pageSize=${this.props.pageSize}`;
+    const url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=${this.apiKey}&page=1&pageSize=${this.props.pageSize}`;
     const data = await fetch(url);
     const parsedData = await data.json();
     this.setState({
@@ -41,8 +43,7 @@ export class News extends Component {
 
   handlePreviousClick = async () => {
     this.setState({ loading: true });
-    const url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}
-        &category=${this.props.category}&apiKey=your_api_key&page=${this.state.page - 1}&pageSize=${this.props.pageSize}`;
+    const url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=${this.apiKey}&page=${this.state.page - 1}&pageSize=${this.props.pageSize}`;
     const data = await fetch(url);
     const parsedData = await data.json();
     this.setState({
@@ -55,12 +56,11 @@ export class News extends Component {
   handleNextClick = async () => {
     if (
       this.state.page + 1 >
-      Math.ceil(this.totalArticles / this.props.pageSize)
+      Math.ceil(this.state.totalArticles / this.props.pageSize)
     )
       return;
     this.setState({ loading: true });
-    const url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}
-        &category=${this.props.category}&apiKey=your_api_key&page=${this.state.page + 1}&pageSize=20${this.props.pageSize}`;
+    const url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=${this.apiKey}&page=${this.state.page + 1}&pageSize=${this.props.pageSize}`;
     const data = await fetch(url);
     const parsedData = await data.json();
     this.setState({
@@ -105,7 +105,7 @@ export class News extends Component {
             type="button"
             disabled={
               this.state.page + 1 >
-              Math.ceil(this.totalArticles / this.props.pageSize)
+              Math.ceil(this.state.totalArticles / this.props.pageSize)
             }
             className="btn btn-dark"
             onClick={this.handleNextClick}
